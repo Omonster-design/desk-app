@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+  <title>Desk</title>
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="top">
+      <div class="brand">Desk</div>
+      <div id="mode-badge" class="badge paper">PAPER</div>
+    </header>
+
+    <main id="screens">
+      <section id="screen-home" class="screen active">
+        <div class="card" id="home-balance">
+          <div class="muted">Stack</div>
+          <div class="big" id="stack-val">—</div>
+          <div class="muted" id="free-val">free —</div>
+        </div>
+        <div class="card" id="home-positions">
+          <div class="row between"><span>Open</span><span id="open-count">0</span></div>
+          <div id="pos-list" class="list empty-state">No positions</div>
+        </div>
+        <div class="card" id="home-feed">
+          <div class="row between"><span>Feed</span></div>
+          <div id="feed" class="list empty-state">Waiting for night…</div>
+        </div>
+      </section>
+
+      <section id="screen-agents" class="screen">
+        <div class="card">
+          <div class="muted">Agents</div>
+          <div id="agent-cards" class="agent-grid">
+            <div class="agent" data-a="scanner"><div class="an">Scanner</div><div class="as">—</div></div>
+            <div class="agent" data-a="auditor"><div class="an">Auditor</div><div class="as">—</div></div>
+            <div class="agent" data-a="analyst"><div class="an">Analyst</div><div class="as">—</div></div>
+            <div class="agent" data-a="executor"><div class="an">Executor</div><div class="as">—</div></div>
+            <div class="agent" data-a="risk"><div class="an">Risk</div><div class="as">Guarding</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="muted">Heartbeats</div>
+          <pre id="hb" class="mono">—</pre>
+        </div>
+      </section>
+
+      <section id="screen-activity" class="screen">
+        <div class="card">
+          <div class="row between"><span>Activity</span></div>
+          <div id="activity" class="list empty-state">No activity yet</div>
+        </div>
+      </section>
+
+      <section id="screen-account" class="screen">
+        <div class="card">
+          <div class="muted">Account</div>
+          <div class="row between"><span>Handle</span><span id="fomo-handle">—</span></div>
+          <div class="row between"><span>Mode</span><span id="acct-mode">—</span></div>
+          <div class="row between"><span>Notifier</span><span id="acct-notifier">—</span></div>
+          <div class="row between"><span>Analyst</span><span id="acct-analyst">—</span></div>
+        </div>
+        <div class="card">
+          <div class="muted">Risk</div>
+          <div class="row between"><span>Stop</span><span id="set-stop">—</span></div>
+          <div class="row between"><span>Trail</span><span id="set-trail">—</span></div>
+          <label class="slider-row">Stop %
+            <input type="range" id="stop-range" min="0.5" max="50" step="0.5" />
+            <input type="number" id="stop-num" step="0.5" />
+          </label>
+          <button id="save-stop" class="btn">Save stop</button>
+        </div>
+        <div class="card">
+          <a id="signup" class="link" href="https://fomo.family/r/savipww">New to FOMO?</a>
+        </div>
+      </section>
+
+      <section id="screen-error" class="screen">
+        <div class="card error">
+          <div class="big">Error</div>
+          <p id="err-msg">Something went wrong.</p>
+          <button class="btn" onclick="location.reload()">Retry</button>
+        </div>
+      </section>
+
+      <section id="screen-loading" class="screen">
+        <div class="card"><div class="big">Loading…</div></div>
+      </section>
+    </main>
+
+    <nav class="tabs">
+      <button data-tab="home" class="active">Home</button>
+      <button data-tab="agents">Agents</button>
+      <button data-tab="activity">Activity</button>
+      <button data-tab="account">Account</button>
+    </nav>
+  </div>
+  <script src="/chart.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
