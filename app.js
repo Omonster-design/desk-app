@@ -1,11 +1,27 @@
 (function () {
   const hash = new URLSearchParams((location.hash || "#").slice(1));
   const token = hash.get("t") || localStorage.getItem("APP_TOKEN") || "";
-  const dataPath = hash.get("d") || "";
+  const dataPath = hash.get("d") || localStorage.getItem("DATA_PATH") || "";
   if (token) localStorage.setItem("APP_TOKEN", token);
   if (dataPath) localStorage.setItem("DATA_PATH", dataPath);
 
   const apiBase = ""; // same origin plan A
+  const planB = !!dataPath;
+  // Plan B base: absolute URL base, or DATA_PATH string -> ./d/<DATA_PATH>/ on same origin
+  const dataBase = !planB ? "" : (/^https?:\/\//.test(dataPath)
+    ? dataPath.replace(/\/+$/, "") + "/"
+    : "./d/" + encodeURIComponent(dataPath) + "/");
+  const POLL_MS = 15000;
+
+  async function getJson(name) {
+    const res = await fetch(dataBase + name + "?_=" + Date.now(), { cache: "no-store" });
+    if (res.status === 404) throw new Error("waiting");
+    if (!res.ok) throw new Error("http " + res.status);
+    return res.json();
+  }
+  async function loadState() {
+    return planB ? getJson("state.json") : api("/api/state");
+  }
 
   function show(tab) {
     document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
@@ -96,6 +112,25 @@
       show("error");
       return;
     }
+    if (planB) {
+      let shown = false;
+      const tick = async () => {
+        try {
+          render(await loadState());
+          if (!shown) { show("home"); shown = true; }
+        } catch (e) {
+          if (!shown) {
+            document.getElementById("err-msg").textContent = e.message === "waiting"
+              ? "Waiting for desk data… (no state.json published yet; retrying every 15s)"
+              : "Data fetch failed: " + (e.message || e) + " (retrying)";
+            show("error");
+          }
+        }
+      };
+      await tick();
+      setInterval(tick, POLL_MS);
+      return;
+    }
     try {
       const state = await api("/api/state");
       render(state);
@@ -121,6 +156,7 @@
   });
   document.getElementById("save-stop").addEventListener("click", async () => {
     const v = Number(document.getElementById("stop-num").value);
+    if (planB) { alert("Read-only on Plan B: change settings via Telegram."); return; }
     try {
       await api("/api/settings", { method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ stop_pct: v }) });
@@ -132,7 +168,7 @@
   });
 
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/sw.js").catch(() => {});
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
   }
 
   boot();
